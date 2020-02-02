@@ -61,33 +61,130 @@ function compile(compiler,code,input,callback){
         filename="code.py";
         // command=`python code.py < input.txt > output.txt`;
         command=`python code.py < input.txt`;
+        fs.writeFile(filename,code,'utf8',(err)=>{
+          if(err){
+            console.log(err);
+            return;
+          }
+          exec(command,(error,stdout,stderr)=>{
+            if(error){
+              console.log(error);
+            }
+            if(stderr){
+              console.log(stderr);
+              output ="STDERR:"+stderr;
+            }else{
+            console.log(stdout);
+            output = stdout;
+            }
+            callback(output);
+          });
+        });
       }else if(compiler==='PYTHON3'){
         filename="code.py";
         // command=`python3 code.py < input.txt > output.txt`;
         command=`python3 code.py < input.txt`;
+        fs.writeFile(filename,code,'utf8',(err)=>{
+          if(err){
+            console.log(err);
+            return;
+          }
+          exec(command,(error,stdout,stderr)=>{
+            if(error){
+              console.log(error);
+            }
+            if(stderr){
+              console.log(stderr);
+              output ="STDERR:"+stderr;
+            }else{
+            console.log(stdout);
+            output = stdout;
+            }
+            callback(output);
+          });
+        });
+      }else if(compiler==='CPP'){
+        filename = "code.cpp";
+        command = "g++ code.cpp -o code.exe";
+        fs.writeFile(filename,code,'utf8',(err)=>{
+          if(err){
+            console.log(err);
+            return;
+          }
+          exec(command,(err,stdout,stderr)=>{
+            if(err){
+              console.log(err);
+              return;
+            }
+            if(stderr){
+              console.log(stderr);
+              output="STDERR: "+stderr;
+              callback(output);
+            }else{
+              command = "code.exe";
+              exec(command,(err,stdout,stderr)=>{
+                if(err){
+                  console.log(err);
+                  return;
+                }
+                if(stderr){
+                  console.log(stderr);
+                  output="STDERR: "+stderr;
+                }
+                else{
+                  console.log(stdout);
+                  output=stdout;
+                }
+                fs.unlink("code.exe",()=>{
+                  console.log("File Deleted!");
+                });
+                callback(output);
+              });
+            }
+          });
+        });
+      }else if(compiler==='C'){
+        filename = "code.c";
+        command = "gcc code.c -o code";
+        fs.writeFile(filename,code,'utf8',(err)=>{
+          if(err){
+            console.log(err);
+            return;
+          }
+          exec(command,(err,stdout,stderr)=>{
+            if(err){
+              console.log(err);
+            }
+            if(stderr){
+              console.log(stderr);
+              output="STDERR: "+stderr;
+              callback(output);
+            }else{
+              command = `code.exe`;
+              exec(command,(err,stdout,stderr)=>{
+                if(err){
+                  console.log(err);
+                }
+                if(stderr){
+                  console.log(stderr);
+                  output="STDERR: "+stderr;
+                }
+                else{
+                  console.log(stdout);
+                  output=stdout;
+                }
+                fs.unlink("code.exe",()=>{
+                  console.log("File Deleted!");
+                });
+                callback(output);
+              });
+            }
+          });
+        });
       }else{
         output="INVALID COMPILER"
         callback(output);
         return;
       }
-      fs.writeFile(filename,code,'utf8',(err)=>{
-        if(err){
-          console.log(err);
-          return;
-        }
-        exec(command,(error,stdout,stderr)=>{
-          if(error){
-            console.log(error);
-          }
-          if(stderr){
-            console.log(stderr);
-            output ="STDERR:"+stderr;
-          }else{
-          console.log(stdout);
-          output = stdout;
-          }
-          callback(output);
-        });
-      })
   });
 }
